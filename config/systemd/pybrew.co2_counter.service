@@ -1,0 +1,11 @@
+[Unit]
+Description=PyBrew CO2 Counter service
+
+[Service]
+User=pybrew
+ExecStart=/usr/bin/python2.7 -m pybrew.workers.co2_counter -c /etc/pybrew/co2_counter.json
+RestartSec=2
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,8 +1,29 @@
 import logging
 from twilio.rest import TwilioRestClient
+from zappa.core import mail
 
 
 logger = logging.getLogger('brew.alarm')
+
+
+def _build_email_msg_alarm(config):
+    def alarm(msg):
+        with mail.create_context(config['username'],
+                                 config['password'],
+                                 config['server'],
+                                 config['port'],
+                                 ) as mail_context:
+            try:
+                mail.send(mail_context,
+                          config['from'],
+                          config['respondents'],
+                          subject='Brew Emergency',
+                          text_body=msg)
+            except:
+                logger.critical("Could not contact respondent %s to respond "
+                                "to brew emergency!" % config['respondents'],
+                                exc_info=True)
+    return alarm
 
 
 def _build_text_msg_alarm(config):
@@ -29,8 +50,11 @@ def build_alarms(config):
         return []
 
     alarms = []
-    if 'SMS' in alarms:
-        alarms.append(_build_text_msg_alarm(alarms['SMS']))
+
+    if 'email' in alarms:
+        alarms.append(_build_email_msg_alarm(alarms['email']))
+    if 'sms' in alarms:
+        alarms.append(_build_text_msg_alarm(alarms['sms']))
 
     return alarms
 

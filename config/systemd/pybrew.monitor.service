@@ -1,0 +1,11 @@
+[Unit]
+Description=PyBrew monitoring service
+
+[Service]
+User=pybrew
+ExecStart=/usr/bin/python2.7 -m pybrew.workers.monitor -c /etc/pybrew/monitor.json
+RestartSec=2
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

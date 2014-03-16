@@ -1,11 +1,12 @@
-import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
 
 
 class GPIOOutput(object):
     """docstring for GPIO"""
     def __init__(self, pin_number):
         self.pin_number = pin_number
-        GPIO.set_up(self.pin_number, GPIO.OUT)
+        # GPIO.set_up(self.pin_number, GPIO.OUT)
+        self._is_on = False
 
     @property
     def is_on(self):
@@ -15,8 +16,8 @@ class GPIOOutput(object):
         if turn_on is self.is_on:
             return
 
-        gpio_val = GPIO.HIGH if turn_on else GPIO.LOW
-        GPIO.output(self.pin_number, gpio_val)
+        # gpio_val = GPIO.HIGH if turn_on else GPIO.LOW
+        # GPIO.output(self.pin_number, gpio_val)
         self._is_on = turn_on
 
     def on(self):

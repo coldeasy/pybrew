@@ -1,0 +1,15 @@
+{
+    "input_file_path": "/dev/input/mouse0",
+    "output_file_path": "/usr/share/pybrew/co2_raw_data",
+    "measurement_interval": 1,
+    "metrics": {
+        "endpoint": "localhost:514",
+        "hmac_key": "ffffffffffffffffffffff"
+    },
+    "logging": 
+    {
+        "level": "INFO",
+        "stdout": true,
+        "syslog": true
+    }
+}

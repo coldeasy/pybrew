@@ -1,5 +1,4 @@
 from pybrew import metrics
-from pybrew import co2_counter
 from pybrew import temperatures
 from pybrew import alarm
 from pybrew import gpio
@@ -8,12 +7,12 @@ from pybrew import gpio
 class Coordinator(object):
     def __init__(self, config):
         self.config = config
-        self.metrics = metrics.Metrics(config)
+        self.metrics = metrics.Metrics(config['metrics'])
         self.temp_alarm = alarm.TemperatureAlarm(config)
         self.brew_temp_monitor = temperatures.Temperature(
             config['brew_thermometer_slave'],
             config['brew_temperature_update_interval'],
-            metrics.Metrics(config)
+            metrics.Metrics(config['metrics'])
         )
 
         # self.water_temp_monitor = temperatures.Temperature(
@@ -26,10 +25,6 @@ class Coordinator(object):
         self.water_pump = gpio.GPIOOutput(
             config['water_pump_gpio_pin']
         )
-
-        # self.co2_counter = co2_counter.Counter(
-        #     gpio.GPIO(config['water_pump_gpio_pin'])
-        # )
 
         self.brew_temp_range = (
             float(config['brew_temp_min']),

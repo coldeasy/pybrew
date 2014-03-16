@@ -1,0 +1,11 @@
+[Unit]
+Description=PyBrew metrics recorder service
+
+[Service]
+User=pybrew
+ExecStart=/usr/bin/python2.7 -m pybrew.server.worker -c /etc/pybrew/metrics_recorder.json
+RestartSec=2
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

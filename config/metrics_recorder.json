@@ -1,0 +1,15 @@
+{
+    "db": {
+        "user": "root",
+        "pass": "",
+        "name": "pybrew"
+    },
+    "endpoint": "localhost:6424",
+    "hmac_key": "ffffffffffffffffffffff",
+    "logging": 
+    {
+        "level": "INFO",
+        "stdout": true,
+        "syslog": true
+    }
+}

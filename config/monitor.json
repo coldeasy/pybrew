@@ -1,0 +1,20 @@
+{
+    "brew_thermometer_slave": "/sys/bus/w1/devices/28-0000055d6e19/w1_slave",
+    "brew_temperature_update_interval": 5,
+    "water_heater_gpio_pin": 16,
+    "water_pump_gpio_pin": 11,
+    "brew_temp_min": 17,
+    "brew_temp_max": 22,
+    "brew_temp_critical_max": 25,
+    "brew_temp_critical_min": 15,
+    "metrics": {
+        "endpoint": "localhost:6424",
+        "hmac_key": "ffffffffffffffffffffff"
+    },
+    "logging": 
+    {
+        "level": "INFO",
+        "stdout": true,
+        "syslog": true
+    }
+}

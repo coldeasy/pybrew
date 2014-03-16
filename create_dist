@@ -1,0 +1,29 @@
+#!/usr/bin/python2.7
+import sys
+from pybrew import __version__
+from zappa import core
+import logging
+
+soh = logging.StreamHandler(sys.stdout)
+soh.setLevel(logging.INFO)
+logger = logging.getLogger()
+logger.addHandler(soh)
+
+bump_major = 'major' in sys.argv[1:]
+bump_minor = 'minor' in sys.argv[1:]
+
+version_parts = __version__.split('.')
+if bump_major:
+    version_parts[0] = int(version_parts[0]) + 1
+    version_parts[1] = 0
+if bump_minor:
+    version_parts[1] = int(version_parts[1]) + 1
+
+__version__ = '.'.join([str(x) for x in version_parts])
+with open('src/pybrew/__init__.py', 'w') as version_file:
+    version_file.write('__version__ = "%s"' % __version__)
+
+filename = 'python2-pybrew-{}.tar.gz'.format(__version__)
+core.execute('tar', '-zvcf', filename,
+             'config', 'setup.py', 'src',
+             log=True, cwd='.')

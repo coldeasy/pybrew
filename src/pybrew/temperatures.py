@@ -1,9 +1,11 @@
 import re
 import time
 import threading
+import logging
 
 
 TEMP_RE_EXP = r't=(?P<temp>\d+)'
+logger = logging.getLogger("pybrew")
 
 
 class _TemperatureFetcher(threading.Thread):
@@ -44,4 +46,6 @@ class Temperature(object):
 
     @property
     def temperature(self):
+        if self._fetcher.temperature is None:
+            logger.critical("Temperature fetcher is not running!!")
         return self._fetcher.temperature

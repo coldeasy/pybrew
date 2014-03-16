@@ -1,0 +1,34 @@
+# Maintainer: Colin Deasy <coldeasy@gmail.com>
+
+pkgbase=python2-pybrew
+pkgname=python2-pybrew
+_pkgbasename=pybrew
+pkgver=0.1
+pkgrel=1
+pkgdesc="pybrew"
+url=""
+license=('BSD')
+arch=('any')
+makedepends=('python2')
+depends=('python2')
+provides=('pybrew')
+replaces=('pybrew')
+backup=('etc/pybrew/monitor.json'
+        'etc/pybrew/co2_counter.json'
+        'etc/pybrew/metrics_recorder.json'
+        'etc/systemd/system/pybrew.monitor.service'
+        'etc/systemd/system/pybrew.co2_counter.service'
+        'etc/systemd/system/pybrew.recorder.service')
+
+source=(${pkgname}-${pkgver}.tar.gz)
+install='install'
+
+package() {
+  cd "${srcdir}/"
+  python2 setup.py install --root="${pkgdir}"
+  mkdir -p ${pkgdir}/etc/pybrew
+  cp -r config/*.json ${pkgdir}/etc/pybrew/
+
+  mkdir -p ${pkgdir}/etc/systemd/system
+  cp -r config/systemd/* ${pkgdir}/etc/systemd/system/
+}
