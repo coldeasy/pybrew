@@ -51,10 +51,12 @@ def build_alarms(config):
 
     alarms = []
 
-    if 'email' in alarms:
-        alarms.append(_build_email_msg_alarm(alarms['email']))
-    if 'sms' in alarms:
-        alarms.append(_build_text_msg_alarm(alarms['sms']))
+    if 'email' in alarms_config:
+        logger.info("Building email alarm")
+        alarms.append(_build_email_msg_alarm(alarms_config['email']))
+    if 'sms' in alarms_config:
+        logger.info("Building sms alarm")
+        alarms.append(_build_text_msg_alarm(alarms_config['sms']))
 
     return alarms
 
@@ -62,6 +64,7 @@ def build_alarms(config):
 class TemperatureAlarm(object):
     def __init__(self, config):
         self.alarms = build_alarms(config)
+        logger.info("Configured %d alarms", len(self.alarms))
 
     def me_brew_is_fecked(self, brew_temp, _brew_temp_critical_range):
         msg = "Help!! My homebrew temperature (%s) is critical!" % brew_temp

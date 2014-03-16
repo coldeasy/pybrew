@@ -1,12 +1,12 @@
 import mock
 import unittest
-from pybrew.alarms import TemperatureAlarm
-from pybrew.tests import data
+from pybrew.alarm import TemperatureAlarm
+from tests import data
 
 
 class AlarmsTestCase(unittest.TestCase):
     def setUp(self):
-        super(self, AlarmsTestCase).setUp()
+        super(AlarmsTestCase, self).setUp()
         self.config = data.get_test_alarms_config()
         self.alarm = TemperatureAlarm(self.config)
 

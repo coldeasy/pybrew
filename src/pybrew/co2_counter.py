@@ -31,8 +31,9 @@ class Counter(object):
             dx2 = dx - ((0x80 & dx) << 1)
             dy2 = dy - ((0x80 & dy) << 1)
             if out_fp:
-                out_fp.write("STATUS:%#02x,  DX:DY(%d:%d), DX2:DY2(%d:%d)\n"
-                             % (status, dx, dy, dx2, dy2))
+                out_fp.write("TIME:%s, STATUS:%#02x, DX:DY(%d:%d), "
+                             "DX2:DY2(%d:%d)\n"
+                             % (time.time(), status, dx, dy, dx2, dy2))
                 out_fp.flush()
 
     @staticmethod
