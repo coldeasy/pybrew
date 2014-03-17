@@ -34,14 +34,25 @@ class Coordinator(object):
         )
 
         self.brew_temp_range = (
-            float(config['brew_temp_min']),
-            float(config['brew_temp_max']),
+            config['brew_temp_min'],
+            config['brew_temp_max'],
         )
 
         self.brew_temp_critical_range = (
-            float(config['brew_temp_critical_min']),
-            float(config['brew_temp_critical_max']),
+            config['brew_temp_critical_min'],
+            config['brew_temp_critical_max'],
         )
+
+        logger.debug("Configured controls with\n"
+                     "Brew temperature (min,max)=(%d,%d)\n"
+                     "Brew crit temperature (min,max)=(%d,%d)\n"
+                     "Brew temp slave (%s)" % (
+                         self.brew_temp_min,
+                         self.brew_temp_max,
+                         self.brew_temp_critical_min,
+                         self.brew_temp_critical_max,
+                         config['brew_thermometer_slave'],
+                     ))
 
     def cleanup(self):
         self.water_pump.off()
@@ -65,12 +76,18 @@ class Coordinator(object):
         return self.brew_temp_critical_range[1]
 
     def _brew_temp_out_of_range(self, brew_temp):
+        if brew_temp is None:
+            return False
+
         in_range = (
             self.brew_temp_min <= brew_temp <= self.brew_temp_max
         )
         return not in_range
 
     def _maybe_send_alarms(self, brew_temp):
+        if brew_temp is None:
+            return False
+
         in_range = (
             self.brew_temp_critical_min <= brew_temp <= self.brew_temp_critical_max
         )
@@ -103,11 +120,14 @@ class Coordinator(object):
         self.metrics.send('heating', 0)
 
     def run(self):
+        logger.debug("Coordinator:run")
         brew_temp = self.brew_temp_monitor.temperature
         if not self._brew_temp_out_of_range(brew_temp):
             return
 
         self._maybe_send_alarms(brew_temp)
+
+        logger.debug("Temp %d out of range, executing controls", brew_temp)
 
         if brew_temp < self.brew_temp_min:
             self._heat_brew(brew_temp)
