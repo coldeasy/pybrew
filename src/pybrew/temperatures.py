@@ -8,9 +8,9 @@ TEMP_RE_EXP = r't=(?P<temp>\d+)'
 logger = logging.getLogger("pybrew")
 
 
-class _TemperatureFetcher(threading.Thread):
+class TemperatureFetcher(threading.Thread):
     def __init__(self, slave_location, interval, metrics):
-        super(_TemperatureFetcher, self).__init__()
+        super(TemperatureFetcher, self).__init__()
         self.slave_location = slave_location
         self.interval = interval
         self.metrics = metrics
@@ -25,22 +25,28 @@ class _TemperatureFetcher(threading.Thread):
         if not match:
             return
 
-        self.temperature = int(match.group('temp'), base=10)
-        self.metrics.send('brew_temp', self.temperature)
+        self._temperature = int(match.group('temp'), base=10)
+        self.metrics.send('brew_temp', self._temperature)
+        logger.debug("Fetcher:Temp:%d", self._temperature)
 
     def run(self):
+        logger.info("Starting temperature fetcher thread")
         while True:
-            with open(self.slave_location, 'r') as in_f:
-                data = in_f.read()
-                self._update_temp_from_data(data)
+            try:
+                with open(self.slave_location, 'r') as in_f:
+                    data = in_f.read()
+                    self._update_temp_from_data(data)
+            except:
+                logger.critical("Could not read temperature", exc_info=True)
+
             time.sleep(self.interval)
 
 
 class Temperature(object):
     def __init__(self, slave_location, fetch_interval, metrics):
-        self._fetcher = _TemperatureFetcher(slave_location,
-                                            fetch_interval,
-                                            metrics)
+        self._fetcher = TemperatureFetcher(slave_location,
+                                           fetch_interval,
+                                           metrics)
         self._fetcher.daemon = True
         self._fetcher.start()
 
@@ -48,4 +54,5 @@ class Temperature(object):
     def temperature(self):
         if self._fetcher.temperature is None:
             logger.critical("Temperature fetcher is not running!!")
+
         return self._fetcher.temperature

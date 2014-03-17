@@ -3,7 +3,7 @@
 pkgbase=python2-pybrew
 pkgname=python2-pybrew
 _pkgbasename=pybrew
-pkgver=0.1
+pkgver=0.2
 pkgrel=1
 pkgdesc="pybrew"
 url=""

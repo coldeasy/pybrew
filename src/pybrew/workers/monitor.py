@@ -1,4 +1,6 @@
+import os
 import sys
+import signal
 import daemon
 import time
 import argparse
@@ -27,12 +29,19 @@ def main():
 
 def run_loop(config):
     zappa.core.setup_logging(config)
-    log = logging.getLogger('brew')
+    log = logging.getLogger('pybrew')
 
     from pybrew import coordinator
     coordinator = coordinator.Coordinator(config)
     sleep_time = int(config.get('sleep_time', SLEEP_TIME_SECONDS))
     log.info("Entering run loop")
+
+    def cleanup(*args, **kwargs):
+        coordinator.cleanup()
+        log.info("Cleaned up")
+        os._exit(0)
+
+    signal.signal(signal.SIGTERM, cleanup)
     while True:
         try:
             coordinator.run()

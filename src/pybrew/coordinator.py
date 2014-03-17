@@ -1,7 +1,12 @@
+import logging
+
 from pybrew import metrics
 from pybrew import temperatures
 from pybrew import alarm
 from pybrew import gpio
+
+
+logger = logging.getLogger("pybrew")
 
 
 class Coordinator(object):
@@ -18,10 +23,12 @@ class Coordinator(object):
         # self.water_temp_monitor = temperatures.Temperature(
         #     gpio.GPIO(config['water_gpio_pin'])
         # )
+        self.water_heater_enabled = config.get('water_heater_enabled', True)
         self.water_heater = gpio.GPIOOutput(
             config['water_heater_gpio_pin']
         )
 
+        self.water_pump_enabled = config.get('water_pump_enabled', True)
         self.water_pump = gpio.GPIOOutput(
             config['water_pump_gpio_pin']
         )
@@ -35,6 +42,11 @@ class Coordinator(object):
             float(config['brew_temp_critical_min']),
             float(config['brew_temp_critical_max']),
         )
+
+    def cleanup(self):
+        self.water_pump.off()
+        self.water_heater.off()
+        gpio.cleanup()
 
     @property
     def brew_temp_min(self):
@@ -69,13 +81,25 @@ class Coordinator(object):
                                           self.brew_temp_critical_range)
 
     def _heat_brew(self, brew_temp):
-        self.water_pump.on()
-        self.water_heater.on()
+        if self.water_pump_enabled:
+            logger.debug("Coordinator:WaterPump:on")
+            self.water_pump.on()
+
+        if self.water_heater_enabled:
+            logger.debug("Coordinator:WaterHeater:on")
+            self.water_heater.on()
+
         self.metrics.send('heating', 1)
 
     def _cool_brew(self, brew_temp):
-        self.water_pump.off()
-        self.water_heater.off()
+        if self.water_pump_enabled:
+            logger.debug("Coordinator:WaterPump:off")
+            self.water_pump.off()
+
+        if self.water_heater_enabled:
+            logger.debug("Coordinator:WaterHeater:off")
+            self.water_heater.off()
+
         self.metrics.send('heating', 0)
 
     def run(self):

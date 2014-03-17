@@ -4,12 +4,12 @@ _add_user() {
 
 ## arg 1:  the new package version
 pre_install() {
-    _add_user pybrew 99
+    # _add_user pybrew 99
 }
 
 ## arg 1:  the new package version
 post_install() {
-  chown -R pybrew:pybrew /etc/pybrew
+  chown -R root:root /etc/pybrew
 }
 
 ## arg 1:  the old package version
