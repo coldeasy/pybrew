@@ -1,3 +1,4 @@
+import time
 import hmac
 import struct
 import hashlib
@@ -14,11 +15,17 @@ SHA256_DIGEST_SIZE = 32
 
 class MetricsRecorder(object):
     def __init__(self, config):
-        self.host, self.port = config['endpoint'].split(':')
-        self.port = int(self.port)
+        self.carbon_host, self.carbon_port = (
+            config['carbon_endpoint'].split(':')
+        )
+        self.carbon_port = int(self.carbon_port)
+        self.carbon_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        self.listen_host, self.listen_port = config['endpoint'].split(':')
+        self.listen_port = int(self.listen_port)
+        self.listen_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
         self.hmac_key = str(config['hmac_key'].decode('base64'))
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.ipaddr = socket.gethostbyname(self.host)
         self.repo = repo.MetricsRepo(config['db'])
 
     @staticmethod
@@ -44,7 +51,7 @@ class MetricsRecorder(object):
         return (key, value)
 
     def _bind(self):
-        self.sock.bind((self.host, self.port))
+        self.listen_sock.bind((self.listen_host, self.listen_port))
 
     def run(self):
         self._bind()
@@ -60,9 +67,13 @@ class MetricsRecorder(object):
 
     def _store_key_value(self, key, value):
         self.repo.store_metric(unicode(key), unicode(value))
+        msg = ' '.join([unicode(s).encode('utf-8')
+                        for s in [key, value, int(time.time())]
+                        ])
+        self.carbon_sock.sendto("pybrew." + msg, (self.carbon_host, self.carbon_port))
 
     def _process_next_payload(self):
-        (data, addr) = self.sock.recvfrom(512)
+        (data, addr) = self.listen_sock.recvfrom(512)
         logger.info("Received data from %s", addr)
         if not data:
             return
