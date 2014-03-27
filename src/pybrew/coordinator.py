@@ -4,6 +4,7 @@ from pybrew import metrics
 from pybrew import temperatures
 from pybrew import alarm
 from pybrew import gpio
+from pybrew import pump
 
 
 logger = logging.getLogger("pybrew")
@@ -29,8 +30,10 @@ class Coordinator(object):
         )
 
         self.water_pump_enabled = config.get('water_pump_enabled', True)
-        self.water_pump = gpio.GPIOOutput(
-            config['water_pump_gpio_pin']
+        self.water_pump = pump.Pump(
+            gpio.GPIOOutput(config['water_pump_gpio_pin']),
+            config.get('pump_max_on_seconds'),
+            config.get('pump_seconds_between_on'),
         )
 
         self.brew_temp_range = (
