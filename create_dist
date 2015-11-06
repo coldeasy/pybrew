@@ -1,7 +1,7 @@
 #!/usr/bin/python2.7
 import sys
+from subprocess import call
 from pybrew import __version__
-from zappa import core
 import logging
 
 soh = logging.StreamHandler(sys.stdout)
@@ -24,6 +24,4 @@ with open('src/pybrew/__init__.py', 'w') as version_file:
     version_file.write('__version__ = "%s"' % __version__)
 
 filename = 'python2-pybrew-{}.tar.gz'.format(__version__)
-core.execute('tar', '-zvcf', filename,
-             'config', 'setup.py', 'src',
-             log=True, cwd='.')
+call(['tar', '-zvcf', filename, 'config', 'setup.py', 'src'])
